@@ -52,4 +52,26 @@ app.get(`/trees/:id`, async (c: Context) => {
   return c.json(tree);
 });
 
+app.put("/trees/:id", async (c: Context) => {
+  const id = await c.req.param("id");
+  const { species, age, location } = await c.req.json();
+  const updatedTree: Tree = { id, species, age, location };
+  setItem(`trees_${id}`, updatedTree);
+  return c.json({
+    message: `Tree has changed, ${location}, ${species}, ${age}`,
+  });
+});
+
+const deleteItem = (key: string) => {
+  localStorage.removeItem(key);
+};
+
+app.delete("/trees/:id", async (c: Context) => {
+  const id = await c.req.param("id");
+  deleteItem(`trees_${id}`);
+  return c.json({
+    message: `Tree ${id} has been cut down`,
+  });
+});
+
 Deno.serve(app.fetch);
